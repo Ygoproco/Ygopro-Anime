@@ -57,7 +57,7 @@ function c100000061.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
 function c100000061.val(e,c)
-	return Duel.GetLP(c:GetControler())/2
+	return Duel.GetLP(c:GetControler())/1
 end
 function c100000061.efr(e,re)
 	return re:GetHandler():GetControler()~=e:GetHandler():GetControler()
