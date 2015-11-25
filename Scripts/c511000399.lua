@@ -28,16 +28,5 @@ function c511000399.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(tc:GetBaseAttack()*3)
 		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetRange(LOCATION_MZONE)
-		e2:SetCode(EVENT_PHASE+PHASE_END)
-		e2:SetOperation(c511000399.desop)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		e2:SetCountLimit(1)
-		tc:RegisterEffect(e2)
 	end
-end
-function c511000399.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
