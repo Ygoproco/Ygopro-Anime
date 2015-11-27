@@ -1,0 +1,125 @@
+--Sorcerer of Dark Magic (Anime)
+--script by: mbcn10ww (The Master)
+function c111000003.initial_effect(c)
+	c:EnableReviveLimit()
+	--cannot special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(aux.FALSE)
+	c:RegisterEffect(e1)
+	--special summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e2:SetRange(LOCATION_HAND)
+	e2:SetCondition(c111000003.spcon)
+	e2:SetOperation(c111000003.spop)
+	c:RegisterEffect(e2)
+	--negate
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(111000003,0))
+	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_CHAINING)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(c111000003.discon)
+	e3:SetTarget(c111000003.distg)
+	e3:SetOperation(c111000003.disop)
+	c:RegisterEffect(e3)
+	--destroy
+	local e4=Effect.CreateEffect(c)
+	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetTarget(c111000003.target)
+	e4:SetOperation(c111000003.activate)
+	c:RegisterEffect(e4)
+	--decrease opponent's monster ATK
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetTargetRange(0,LOCATION_MZONE)
+	e5:SetCode(EFFECT_UPDATE_ATTACK)
+	e5:SetCondition(c111000003.adcon)
+	e5:SetTarget(c111000003.adtg)
+	e5:SetValue(c111000003.adval)
+	c:RegisterEffect(e5)
+end
+function c111000003.rfilter(c)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsLevelAbove(6)
+end
+function c111000003.spcon(e,c)
+	if c==nil then return true end
+	return Duel.CheckReleaseGroup(c:GetControler(),c111000003.rfilter,2,nil)
+end
+function c111000003.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=Duel.SelectReleaseGroup(c:GetControler(),c111000003.rfilter,2,2,nil)
+	Duel.Release(g,REASON_COST)
+end
+function c111000003.discon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		and re:IsActiveType(TYPE_TRAP) and Duel.IsChainNegatable(ev)
+end
+function c111000003.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	end
+end
+function c111000003.disop(e,tp,eg,ep,ev,re,r,rp,chk)
+	if e:GetHandler():IsFacedown() or not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.NegateActivation(ev)
+	if re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
+	end
+end
+--negate and destroy
+function c111000003.filter(c)
+	return c:IsDestructable() and c:IsType(TYPE_TRAP) and c:IsFaceup()
+end
+function c111000003.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and c111000003.filter(chkc) and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(c111000003.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,c111000003.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE+CATEGORY_DESTROY,g,1,0,0)
+end
+function c111000003.activate(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(RESET_EVENT+0x1fe0000)
+	tc:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	e2:SetReset(RESET_EVENT+0x1fe0000)
+	tc:RegisterEffect(e2)
+	if tc:IsRelateToEffect(e) and tc:IsDestructable() then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
+end
+--atk down
+function c111000003.adcon(e)
+	local ph=Duel.GetCurrentPhase()
+	return (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and Duel.GetAttackTarget()~=nil
+		and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
+end
+function c111000003.adtg(e,c)
+	return c==e:GetHandler():GetBattleTarget()
+end
+function c111000003.adfilter(c)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsPreviousLocation(LOCATION_ONFIELD)
+end
+function c111000003.adval(e,c,tp)
+	return Duel.GetMatchingGroupCount(c111000003.adfilter,tp,LOCATION_GRAVE,0,c)*-500
+end
