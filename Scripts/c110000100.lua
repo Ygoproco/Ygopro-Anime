@@ -41,7 +41,7 @@ function c110000100.sdcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(110000100)==0
 end
 function c110000100.sdop(e,tp,eg,ep,ev,re,r,rp)	
-	e:GetHandler():CopyEffect(48179391,RESET_EVENT+0x1fe0000)
+	e:GetHandler():CopyEffect(511000256,RESET_EVENT+0x1fe0000)
 	e:GetHandler():RegisterFlagEffect(110000100,RESET_EVENT+0x1fe0000,0,1)
 end
 function c110000100.atcon(e)
