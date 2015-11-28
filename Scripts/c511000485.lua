@@ -47,7 +47,6 @@ end
 function c511000485.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc and tc:IsLocation(LOCATION_HAND+LOCATION_SZONE) and tc:IsControler(tp) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(tp,tc)
+		Duel.SendtoGrave(tc,nil,REASON_EFFECT)
 	end
 end
