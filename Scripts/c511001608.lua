@@ -54,6 +54,14 @@ function c511001608.initial_effect(c)
 	e6:SetTarget(c511001608.destg)
 	e6:SetOperation(c511001608.desop)
 	c:RegisterEffect(e6)
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_FIELD)
+	e7:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e7:SetRange(LOCATION_SZONE)
+	e7:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e7:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x48))
+	e7:SetValue(c511001608.indval)
+	c:RegisterEffect(e7)
 	if not c511001608.global_check then
 		c511001608.global_check=true
 		c511001608[0]=0
