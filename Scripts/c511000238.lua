@@ -1,6 +1,5 @@
 --Slifer the Sky Dragon
 function c511000238.initial_effect(c)
-	c:SetUniqueOnField(1,0,511000238)
 	--Summon with 3 Tribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -97,7 +96,8 @@ function c511000238.initial_effect(c)
 	e17:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e17:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e17:SetRange(LOCATION_MZONE)
-	e17:SetValue(c511000238.indes)
+	e17:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e17:SetValue(1)
 	c:RegisterEffect(e17)
 	--atk/def
 	local e18=Effect.CreateEffect(c)
