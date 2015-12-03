@@ -97,12 +97,13 @@ function c51100236.initial_effect(c)
 	e13:SetCode(EFFECT_MATERIAL_CHECK)
 	e13:SetValue(c51100236.valcheck)
 	c:RegisterEffect(e13)
+	--give atk effect only when summon
 	local e14=Effect.CreateEffect(c)
 	e14:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e14:SetCode(EVENT_SUMMON_SUCCESS)
 	e14:SetOperation(c51100236.atkdefop)
 	c:RegisterEffect(e14)
-	--pay atk
+	--Point-to-Point Transfer
 	local e15=Effect.CreateEffect(c)
 	e15:SetDescription(aux.Stringid(51100236,1))
 	e15:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -117,7 +118,9 @@ function c51100236.initial_effect(c)
 	e16:SetDescription(aux.Stringid(51100236,6))
 	e16:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e16:SetCode(EVENT_BE_BATTLE_TARGET)
+	e16:SetRange(LOCATION_MZONE)
 	e16:SetCondition(c51100236.negcon)
+	e16:SetTarget(c51100236.negtg)
 	e16:SetOperation(c51100236.negop)
 	c:RegisterEffect(e16)
 	--Egyptian God Phoenix
@@ -143,7 +146,7 @@ function c51100236.dffilter(c)
 	return c:IsCode(95286165)
 end
 function c51100236.dfop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()	
+	local c=e:GetHandler()  
 	local g=Duel.GetMatchingGroup(c51100236.dffilter,c:GetControler(),0xff,0xff,nil)
 	local tc=g:GetFirst()
 	while tc do
@@ -160,7 +163,7 @@ function c51100236.dfop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetTarget(c51100236.tg)
 			e1:SetOperation(c51100236.op)
 			tc:RegisterEffect(e1)
-			tc:RegisterFlagEffect(51100236,0,0,1) 	
+			tc:RegisterFlagEffect(51100236,0,0,1)   
 		end
 		tc=g:GetNext()
 	end
@@ -286,6 +289,7 @@ function c51100236.payatkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(lp-1)
 	Duel.PayLPCost(tp,lp-1)
 end
+--Pay 1000 LP to destroy 1 monster
 function c51100236.payatkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local lp=e:GetLabel()
@@ -309,6 +313,19 @@ function c51100236.payatkop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e3,true)
+		local def=Effect.CreateEffect(c)
+		def:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(def)
+		local e4=Effect.CreateEffect(c)
+		e4:SetDescription(aux.Stringid(2191144,0))
+		e4:SetType(EFFECT_TYPE_QUICK_O)
+		e4:SetCode(EVENT_FREE_CHAIN)
+		e4:SetRange(LOCATION_MZONE)
+		e4:SetCost(c51100236.tatkcost)
+		e4:SetOperation(c51100236.tatkop)
+		e4:SetLabelObject(def)
+		e4:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e4)
 	end
 end
 function c51100236.egpcon(e,tp,eg,ep,ev,re,r,rp)
@@ -339,9 +356,8 @@ function c51100236.egpop(e,tp,eg,ep,ev,re,r,rp)
 		local e3=Effect.CreateEffect(c)
 		e3:SetDescription(aux.Stringid(39853199,0))
 		e3:SetCategory(CATEGORY_DESTROY)
-		e3:SetType(EFFECT_TYPE_IGNITION)
+		e3:SetType(EFFECT_TYPE_QUICK_O)
 		e3:SetRange(LOCATION_MZONE)
-		e3:SetCountLimit(1)
 		e3:SetCost(c51100236.descost)
 		e3:SetTarget(c51100236.destg)
 		e3:SetOperation(c51100236.desop)
@@ -411,8 +427,8 @@ function c51100236.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c51100236.tatkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,2,e:GetHandler()) end
-	local g=Duel.SelectReleaseGroup(tp,nil,2,2,e:GetHandler())
+	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,e:GetHandler()) end
+	local g=Duel.SelectReleaseGroup(tp,nil,1,Duel.GetReleaseGroupCount(tp),e:GetHandler())
 	local tc=g:GetFirst()
 	local suma=0
 	local sumd=0
@@ -469,9 +485,15 @@ function c51100236.dirop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c51100236.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
-	return a:IsControler(1-tp) and a:IsFaceup() and a:IsAttribute(ATTRIBUTE_DEVINE) and a:IsRace(RACE_DEVINE) 
-		and not a:IsCode(10000011) and not a:IsCode(21208154)
+	return a:IsAttribute(ATTRIBUTE_DEVINE) and a:IsRace(RACE_DEVINE) 
+		and not a:IsCode(10000011) and not a:IsCode(21208154) and not a:IsCode(51100236) and not a:IsCode(110000010) and not a:IsCode(511000245) and not a:IsCode(511000264)
+end
+function c51100236.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
 end
 function c51100236.negop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateAttack()
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.NegateAttack()
+	end
 end
