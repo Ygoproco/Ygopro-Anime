@@ -38,6 +38,22 @@ function c511000515.initial_effect(c)
 	e4:SetTarget(c511000515.target)
 	e4:SetOperation(c511000515.operation)
 	c:RegisterEffect(e4)
+	--battle indestructable
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e5:SetValue(c511000515.indes)
+	c:RegisterEffect(e5)
+	if not c511000515.global_check then
+		c511000515.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511000515.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
 end
 c511000515.xyz_number=95
 function c511000515.banfilter(c)
@@ -118,4 +134,7 @@ function c511000515.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.FromCards(a,d)
 	local rg=g:Filter(Card.IsRelateToBattle,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
+end
+function c511000515.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
