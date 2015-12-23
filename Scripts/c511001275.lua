@@ -54,6 +54,22 @@ function c511001275.initial_effect(c)
 	e5:SetTarget(c511001275.atktg2)
 	e5:SetOperation(c511001275.atkop2)
 	c:RegisterEffect(e5)
+	--battle indestructable
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e6:SetValue(c511001275.indes)
+	c:RegisterEffect(e6)
+	if not c511001275.global_check then
+		c511001275.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511001275.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
 end
 c511001275.xyz_number=38
 function c511001275.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -137,4 +153,7 @@ function c511001275.atkop2(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(e:GetHandler():GetPreviousAttackOnField())
 		tc:RegisterEffect(e1)
 	end
+end
+function c511001275.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
