@@ -23,6 +23,22 @@ function c511000514.initial_effect(c)
 	e2:SetCost(c511000514.atkcost)
 	e2:SetOperation(c511000514.atkop)
 	c:RegisterEffect(e2)
+	--battle indestructable
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e3:SetValue(c511000514.indes)
+	c:RegisterEffect(e3)
+	if not c511000514.global_check then
+		c511000514.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511000514.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
 end
 c511000514.xyz_number=84
 function c511000514.cfilter(c)
@@ -57,4 +73,7 @@ function c511000514.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(ev)
 		c:RegisterEffect(e1)
 	end
+end
+function c511000514.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
