@@ -33,10 +33,26 @@ function c511000294.initial_effect(c)
 	e3:SetTarget(c511000294.destg)
 	e3:SetOperation(c511000294.desop)
 	c:RegisterEffect(e3)
+	--battle indestructable
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e4:SetValue(c511000294.indes)
+	c:RegisterEffect(e4)
+	if not c511000294.global_check then
+		c511000294.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511000294.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
 end
 c511000294.xyz_number=1000
 function c511000294.negfilter(c)
-	return c:IsSetCard(0x1048) or c:IsSetCard(0x1073)
+	return c:IsSetCard(0x1048) or c:IsSetCard(0x1073) or c:IsCode(511000296)
 end
 function c511000294.negop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c511000294.negfilter,tp,0,LOCATION_MZONE,nil)
@@ -85,7 +101,7 @@ function c511000294.desfilter(c)
 	return c:IsDestructable()
 end
 function c511000294.xyzfilter(c,e,tp)
-	return (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return (c:IsSetCard(0x1048) or c:IsSetCard(0x1073) or c:IsCode(511000296)) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c511000294.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -131,4 +147,7 @@ function c511000294.desop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SpecialSummonComplete()
 		end
 	end
+end
+function c511000294.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
