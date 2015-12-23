@@ -1,4 +1,4 @@
---No.8 紋章王ゲノム・ヘリター
+--Number 8: Heraldic King Genom-Heritage (anime)
 function c511001374.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x76),4,2)
@@ -34,6 +34,32 @@ function c511001374.initial_effect(c)
 	e2:SetCondition(c511001374.cocon)
 	e2:SetOperation(c511001374.coop)
 	c:RegisterEffect(e2)
+	if not c511001374.global_check then
+		c511001374.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511001374.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
+	--battle indestructable
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e3:SetValue(c511001374.indes)
+	c:RegisterEffect(e3)
+	if not c511001374.global_check then
+		c511001374.global_check=true
+		local ge3=Effect.CreateEffect(c)
+		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge3:SetCode(EVENT_ADJUST)
+		ge3:SetCountLimit(1)
+		ge3:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge3:SetOperation(c511001374.numchk)
+		Duel.RegisterEffect(ge3,0)
+	end
 end
 c511001374.xyz_number=8
 function c511001374.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -102,4 +128,11 @@ function c511001374.coop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
 	end
+end
+function c511001374.numchk(e,tp,eg,ep,ev,re,r,rp)
+	Duel.CreateToken(tp,47387961)
+	Duel.CreateToken(1-tp,47387961)
+end
+function c511001374.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
