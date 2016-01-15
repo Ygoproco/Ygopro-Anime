@@ -43,6 +43,22 @@ function c511000369.initial_effect(c)
 	e4:SetCost(c511000369.regcost)
 	e4:SetOperation(c511000369.regop)
 	c:RegisterEffect(e4)
+	--battle indestructable
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e5:SetValue(c511000369.indes)
+	c:RegisterEffect(e5)
+	if not c511000369.global_check then
+		c511000369.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511000369.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
 end
 function c511000369.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttacker()
@@ -103,7 +119,7 @@ function c511000369.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c511000369.atkupcon)
 	e1:SetOperation(c511000369.atkupop)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function c511000369.atkupcon(e,tp,eg,ep,ev,re,r,rp)
@@ -119,4 +135,7 @@ function c511000369.atkupop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
 	e1:SetValue(atk)
 	c:RegisterEffect(e1)
+end
+function c511000369.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
