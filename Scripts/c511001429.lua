@@ -1,4 +1,4 @@
---CNo.102 光堕天使ノーブル・デーモン
+--Number C102: Archfiend Seraph (anime)
 function c511001429.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),5,4)
@@ -33,6 +33,32 @@ function c511001429.initial_effect(c)
 	e3:SetTarget(c511001429.trtg)
 	e3:SetOperation(c511001429.trop)
 	c:RegisterEffect(e3)
+	if not c511001429.global_check then
+		c511001429.global_check=true
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge2:SetOperation(c511001429.numchk)
+		Duel.RegisterEffect(ge2,0)
+	end
+	--battle indestructable
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e4:SetValue(c511001429.indes)
+	c:RegisterEffect(e4)
+	if not c511001429.global_check then
+		c511001429.global_check=true
+		local ge3=Effect.CreateEffect(c)
+		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge3:SetCode(EVENT_ADJUST)
+		ge3:SetCountLimit(1)
+		ge3:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+		ge3:SetOperation(c511001429.numchk)
+		Duel.RegisterEffect(ge3,0)
+	end
 end
 c511001429.xyz_number=102
 function c511001429.con(e,tp,eg,ep,ev,re,r,rp)
@@ -108,4 +134,11 @@ function c511001429.trop(e,tp,eg,ep,ev,re,r,rp)
 		local atk=e:GetHandler():GetAttack()
 		Duel.Damage(p,atk,REASON_EFFECT)
 	end
+end
+function c511001429.numchk(e,tp,eg,ep,ev,re,r,rp)
+	Duel.CreateToken(tp,67173574)
+	Duel.CreateToken(1-tp,67173574)
+end
+function c511001429.indes(e,c)
+	return not c:IsSetCard(0x48)
 end
